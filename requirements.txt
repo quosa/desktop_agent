@@ -1,0 +1,12 @@
+# Screenshot Organizer Dependencies
+
+# Image processing
+Pillow>=10.0.0
+
+# Perceptual hashing for image similarity
+imagehash>=4.3.0
+
+# Optional: For future CLIP-based semantic naming
+# transformers>=4.30.0
+# torch>=2.0.0
+# clip-by-openai>=1.0
