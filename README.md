@@ -5,10 +5,19 @@ Automatically organize test screenshots on your desktop into session folders bas
 ## Features
 
 - **Time-based clustering**: Groups screenshots taken within a configurable time window (default: 15 minutes)
+  - **Hard cutoff at 04:00 UTC**: Always splits sessions at 4am, even if you continue working
+- **Smart session naming** (NEW! ✨): Uses OCR + local LLM to generate descriptive names
+  - Example: `2025-09-01_143000_webgpu_performance_tests` instead of `session_1`
+  - Extracts text from screenshots using Tesseract OCR
+  - Uses Ollama (local LLM) to generate meaningful names from keywords
+  - Filters out generic terms (localhost, chrome, etc.) with smart denylist
+  - Boosts organization/test names found in screenshots
+- **Session merging** (NEW! 🔗): Intelligently merges similar sessions
+  - Merges consecutive sessions with high keyword similarity
+  - Respects 04:00 UTC cutoff (never merges across night boundary)
+  - Max 4-hour gap for merging
+  - Example: Merges `webgpu_performance_tests` + `webgpu_rendering_tests` → `webgpu_testing`
 - **Visual similarity detection** (optional): Uses perceptual hashing to detect context switches - disabled by default for multi-system monitoring
-- **Smart session naming**: Generates timestamped folder names (e.g., `2025-10-01_143000_session_1`)
-  - Future: OCR-based keyword extraction for descriptive names
-  - Future: CLIP-based semantic classification
 - **Uncategorized handling**: Isolated screenshots moved to separate `uncategorized/` folder
 - **Preview mode**: Shows proposed groupings before moving any files
 - **Dry-run support**: Test without actually moving files
@@ -69,11 +78,41 @@ Skip confirmation prompt and proceed automatically:
 ./screenshot_organizer.py --auto-confirm
 ```
 
+### Smart Naming (Recommended! ✨)
+
+Use OCR + LLM for descriptive session names:
+```bash
+./screenshot_organizer.py --smart-naming
+```
+
+### Smart Naming + Session Merging (Best! 🔥)
+
+Combine smart naming with intelligent merging:
+```bash
+./screenshot_organizer.py --smart-naming --merge-similar
+```
+
+This will:
+1. Extract text from screenshots using OCR
+2. Generate descriptive names using local LLM
+3. Merge similar consecutive sessions automatically
+4. Respect 04:00 UTC cutoff
+
+### Adjust Merge Threshold
+
+Control how aggressively sessions are merged (0.0-1.0):
+```bash
+./screenshot_organizer.py --smart-naming --merge-similar --merge-threshold 0.7
+```
+- Lower (0.3-0.4): More aggressive merging
+- Default (0.5): Balanced
+- Higher (0.7-0.8): More conservative, only merge very similar sessions
+
 ### Verbose Mode
 
-Show detailed similarity scores during processing:
+Show detailed progress and merge decisions:
 ```bash
-./screenshot_organizer.py --verbose
+./screenshot_organizer.py --smart-naming --merge-similar --verbose
 ```
 
 ### Enable Similarity Splitting (Optional)
@@ -83,11 +122,11 @@ Use visual similarity to split sessions (not recommended for multi-system monito
 ./screenshot_organizer.py --enable-similarity --similarity-threshold 15
 ```
 
-### Combined Options
+### Complete Example
 
-Combine multiple options:
+Full-featured organization with all bells and whistles:
 ```bash
-./screenshot_organizer.py --session-gap 20 --enable-similarity --verbose --dry-run
+./screenshot_organizer.py --smart-naming --merge-similar --session-gap 20 --verbose --dry-run
 ```
 
 ## CLI Options
@@ -96,6 +135,9 @@ Combine multiple options:
 Options:
   --desktop-path PATH           Path to organize (default: ~/Desktop)
   --session-gap MINUTES         Max gap between screenshots in same session (default: 15)
+  --smart-naming                Use OCR + LLM for descriptive names (requires tesseract + ollama)
+  --merge-similar               Merge consecutive sessions with similar names
+  --merge-threshold THRESHOLD   Similarity threshold for merging (0.0-1.0, default: 0.5)
   --enable-similarity           Enable visual similarity splitting (disabled by default)
   --similarity-threshold N      Perceptual hash difference threshold (default: 10)
   --dry-run                     Preview without moving files

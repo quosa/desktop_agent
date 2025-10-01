@@ -3,8 +3,11 @@
 # Image processing
 Pillow>=10.0.0
 
-# Perceptual hashing for image similarity
+# Perceptual hashing for image similarity (optional)
 imagehash>=4.3.0
+
+# OCR for text extraction (requires tesseract system install)
+pytesseract>=0.3.10
 
 # Optional: For future CLIP-based semantic naming
 # transformers>=4.30.0
