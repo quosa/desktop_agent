@@ -1,6 +1,6 @@
 # Screenshot Organizer
 
-Automatically organize test screenshots on your desktop into session folders based on time proximity and visual similarity.
+Automatically organize screenshots on your desktop into test session folders based on time proximity and visual similarity.
 
 ## Features
 
